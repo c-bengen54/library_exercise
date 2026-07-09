@@ -1,0 +1,313 @@
+{
+    "books": [
+        {
+            "title": "1984",
+            "author": "George Orwell",
+            "publication": 1949,
+            "genre": "Dystopian",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "To Kill a Mockingbird",
+            "author": "Harper Lee",
+            "publication": 1960,
+            "genre": "Classic",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Hobbit",
+            "author": "J.R.R. Tolkien",
+            "publication": 1937,
+            "genre": "Fantasy",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "Dune",
+            "author": "Frank Herbert",
+            "publication": 1965,
+            "genre": "Science Fiction",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Great Gatsby",
+            "author": "F. Scott Fitzgerald",
+            "publication": 1925,
+            "genre": "Classic",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Catcher in the Rye",
+            "author": "J.D. Salinger",
+            "publication": 1951,
+            "genre": "Classic",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Lord of the Rings",
+            "author": "J.R.R. Tolkien",
+            "publication": 1954,
+            "genre": "Fantasy",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Martian",
+            "author": "Andy Weir",
+            "publication": 2011,
+            "genre": "Science Fiction",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "Jurassic Park",
+            "author": "Michael Crichton",
+            "publication": 1990,
+            "genre": "Science Fiction",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Hunger Games",
+            "author": "Suzanne Collins",
+            "publication": 2008,
+            "genre": "Young Adult",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Da Vinci Code",
+            "author": "Dan Brown",
+            "publication": 2003,
+            "genre": "Mystery",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "Pride and Prejudice",
+            "author": "Jane Austen",
+            "publication": 1813,
+            "genre": "Romance",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "Dracula",
+            "author": "Bram Stoker",
+            "publication": 1897,
+            "genre": "Horror",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "Frankenstein",
+            "author": "Mary Shelley",
+            "publication": 1818,
+            "genre": "Horror",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Shining",
+            "author": "Stephen King",
+            "publication": 1977,
+            "genre": "Horror",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "Harry Potter and the Sorcerer's Stone",
+            "author": "J.K. Rowling",
+            "publication": 1997,
+            "genre": "Fantasy",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Name of the Wind",
+            "author": "Patrick Rothfuss",
+            "publication": 2007,
+            "genre": "Fantasy",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "Mistborn",
+            "author": "Brandon Sanderson",
+            "publication": 2006,
+            "genre": "Fantasy",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "The Road",
+            "author": "Cormac McCarthy",
+            "publication": 2006,
+            "genre": "Post-Apocalyptic",
+            "checked_out": false,
+            "holder": null
+        },
+        {
+            "title": "Ready Player One",
+            "author": "Ernest Cline",
+            "publication": 2011,
+            "genre": "Science Fiction",
+            "checked_out": false,
+            "holder": null
+        }
+    ],
+    "members": [
+        {
+            "name": "Chris",
+            "user_id": 480992,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "James",
+            "user_id": 586809,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Olivia",
+            "user_id": 300853,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Emma",
+            "user_id": 613397,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Liam",
+            "user_id": 777756,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Noah",
+            "user_id": 672931,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Sophia",
+            "user_id": 930686,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Charlotte",
+            "user_id": 258692,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Benjamin",
+            "user_id": 735819,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Lucas",
+            "user_id": 117047,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Amelia",
+            "user_id": 633295,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Mason",
+            "user_id": 225658,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Evelyn",
+            "user_id": 523592,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Henry",
+            "user_id": 165790,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Abigail",
+            "user_id": 454752,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Jackson",
+            "user_id": 811551,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        }
+    ],
+    "admins": [
+        {
+            "name": "Chris",
+            "user_id": 897942,
+            "admin_id": 620523,
+            "log": []
+        },
+        {
+            "name": "Paul",
+            "user_id": 690201,
+            "admin_id": 758269,
+            "log": []
+        }
+    ],
+    "reservation_queue": {},
+    "log": [
+        "[Global] Library registered new member: Chris | 2026-07-09 18:10:18.676000\n",
+        "[Global] Library registered new member: James | 2026-07-09 18:10:18.676008\n",
+        "[Global] Library registered new member: Olivia | 2026-07-09 18:10:18.676011\n",
+        "[Global] Library registered new member: Emma | 2026-07-09 18:10:18.676012\n",
+        "[Global] Library registered new member: Liam | 2026-07-09 18:10:18.676014\n",
+        "[Global] Library registered new member: Noah | 2026-07-09 18:10:18.676015\n",
+        "[Global] Library registered new member: Sophia | 2026-07-09 18:10:18.676017\n",
+        "[Global] Library registered new member: Charlotte | 2026-07-09 18:10:18.676018\n",
+        "[Global] Library registered new member: Benjamin | 2026-07-09 18:10:18.676019\n",
+        "[Global] Library registered new member: Lucas | 2026-07-09 18:10:18.676021\n",
+        "[Global] Library registered new member: Amelia | 2026-07-09 18:10:18.676022\n",
+        "[Global] Library registered new member: Mason | 2026-07-09 18:10:18.676023\n",
+        "[Global] Library registered new member: Evelyn | 2026-07-09 18:10:18.676024\n",
+        "[Global] Library registered new member: Henry | 2026-07-09 18:10:18.676026\n",
+        "[Global] Library registered new member: Abigail | 2026-07-09 18:10:18.676027\n",
+        "[Global] Library registered new admin: Chris | 2026-07-09 18:10:29.913457\n",
+        "[Global] Library registered new member: Jackson | 2026-07-09 18:11:40.935806\n",
+        "[Global] Library registered new admin: Paul | 2026-07-09 18:13:03.880321\n"
+    ]
+}

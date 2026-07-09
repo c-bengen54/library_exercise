@@ -1,10 +1,35 @@
-import os, json, time
+import os, time
 
-from models.library import Library
+from models.library import Library, Book
 
-library = Library()
+if os.path.exists("library.json"):
+    library = Library().load("library.json")
+else:
+    library = Library()
 
-def color_text(text, color = "end"):
+def get_input(question:str, conversion:bool = False) -> str | int:
+    if conversion:
+        while True:
+            try:
+                user_input = input(question)
+                user_input = int(user_input)
+                break
+            except (KeyboardInterrupt, EOFError, ValueError):
+                print(color_text("\nIncorrect input type, please try again\n", "red"))
+                continue
+        return user_input
+    
+    if not conversion:
+        while True:
+            try:
+                user_input = input(question)
+                break
+            except (KeyboardInterrupt, EOFError, ValueError):
+                print(color_text("\nIncorrect input type, please try again\n", "red"))
+                continue
+        return user_input
+
+def color_text(text:str, color:str = "end") -> str:
     """Return a colorized string of text"""
     colors = {
         "bold": "\033[1m",
@@ -21,50 +46,195 @@ def color_text(text, color = "end"):
     return f"{colors.get(color, '')}{text}{colors['end']}"
 
 def main_menu():
+    time.sleep(0.5)
     while True:
-        print("===== Main Menu =====")
+        print("\n===== Main Menu =====")
         print("1. Login Member")
         print("2. Login Admin")
         print("3. Register Member")
         print("4. Register Admin")
         print("5. Exit\n")
         
-        try:
-            user_input = input("> ").strip()
-        except (KeyboardInterrupt, EOFError, ValueError):
-            print(color_text("\nIncorrect input type, please try again\n", "red"))
-            continue
-
-        int(user_input)
-        print(type(user_input))
+        user_input = get_input("> ", True)
 
         if user_input == 1:
-            try:
-                username = input("Input your accounts name: ").strip()
-                user_id = int(input("Input your account ID: "))
-            except (KeyboardInterrupt, EOFError, ValueError):
-                print(color_text("\nIncorrect input type, please try again\n", "red"))
-                continue
+            member_login()
+            
+        elif user_input == 2:
+            admin_login()
 
+        elif user_input == 3:
+            member_name = get_input("\nInput requested name: ")
+            new_member = library.register_member(member_name)
+            print("\nAccount registered", color_text(f"\n{new_member}", "green"))
+            library.save()
 
+        elif user_input == 4:
+            admin_name = get_input("\nInput requested name: ")
+            admin_code = get_input("\nInput admin registration code: ", True)
+            new_admin = library.register_admin(admin_name, admin_code)
+            print("\nAdmin registered", color_text(f"\n{new_admin}", "green"))
+            library.save()
 
+        elif user_input ==5:
+            print(color_text("\nExiting program...", "yellow"))
+            time.sleep(2)
+            print(color_text("\n- Have a wonderful day!!\n", "cyan"))
+            library.save()
+            break
 
-def member_menu():
-    print("===== Member Menu =====")
+        else:
+            print(color_text("\nInputted option either not in menu, or incorrect input type. \nPlease try again.\n", "red"))
+            time.sleep(2)
 
-def admin_menu():
-    print("===== Admin Menu =====")
+def member_login():
+    username = get_input("\nUsername: ")
+    user_id = get_input("\nID: ", True)
 
-def login(username, id):
-    pass
+    for member in library.members:
+        if member.name == username and member.user_id == user_id:
+            print(color_text("\nEntering member menu.....", "yellow"))
+            time.sleep(2)
+            member_menu(member.name)
+            return
 
-def save(data, filepath):
-    pass
+    print(color_text("\nInvalid username or ID.\n", "red"))
 
-def load(filepath):
-    pass 
+def admin_login():
+    username = get_input("\nUsername: ")
+    user_id = get_input("\nUser ID: ", True)
+    admin_id = get_input("\nAdmin ID: ", True)
+    for admin in library.admins:
+        if admin.name == username and admin.user_id == user_id and admin.admin_id == admin_id:
+            print(color_text("\nEntering admin menu.....", "yellow"))
+            time.sleep(2)
+            admin_menu(admin.name)
+            return
+    
+    print(color_text("\nInvalid username, user ID or admin ID", "red"))
 
+def member_menu(member_name):
+    user = library.select_user(member_name, "member")
 
+    while True:
+        print("\n===== Member Menu =====")
+        print("1. Checkout Book")
+        print("2. Reserve Books")
+        print("3. View Catalogue")
+        print("4. Search by Author")
+        print("5. Search by Title")
+        print("6. List Reserved Titles")
+        print("7. List Borrowed Titles")
+        print("8. Exit\n")
+
+        user_input  = get_input("> ", True)
+
+        if user_input == 1:
+            title = get_input("Input title you wish to check out > ")
+            book = library.select_book(title)
+            library.check_out(user, book)
+            print(color_text("Title sucessfully checked out", "green"))
+            library.save()
+            
+
+        elif user_input == 2:
+            title = get_input("Input title you wish to reserve > ")
+            book = library.select_book(title)
+            library.reserve_book(user, book)
+            print(color_text("Title sucessfully reserved", "green"))
+            library.save()
+
+        elif user_input == 3:
+            library.list_available_books()
+            time.sleep(2)
+
+        elif user_input == 4:
+            author = get_input("Input name of author > ")
+            library.search_by_author(author)
+
+        elif user_input == 5:
+            title = get_input("Input title of book > ")
+            library.search_by_title(title)
+
+        elif user_input == 6:
+            user.list_reservations()
+
+        elif user_input == 7:
+            user.list_books()
+
+        elif user_input == 8:
+            print(color_text("Exiting member menu.....", "yellow"))
+            time.sleep(2)
+            break
+
+        else:
+            continue
+
+def admin_menu(admin_name):
+    admin = library.select_user(admin_name, "admin")
+    
+    while True:
+        print("\n===== Admin Menu =====")
+        print("1. Add Book")
+        print("2. Remove Book")
+        print("3. Update User Name")
+        print("4. Update User ID")
+        print("5. View Member Log")
+        print("6. View Global Log")
+        print("7. Exit\n")
+
+        user_input  = get_input("> ", True)
+
+        if user_input == 1:
+            title = get_input("Input title > ")
+            author = get_input("Input books author > ")
+            publication = get_input("Input Publication Year > ", True)
+            genre = get_input("Input book genre > ")
+            book = Book(title, author, publication, genre)
+            library.add_book(book)
+            print(color_text("\nBook added to catalogue successfully", "green"))
+            library.save()
+
+        elif user_input == 2:
+            title = get_input("Input title to be removed > ")
+            book_for_removal = library.select_book(title)
+            library.remove_book(book_for_removal)
+            print(color_text("\nBook removed from catalogue successfully", "green"))
+            library.save()
+
+        elif user_input == 3:
+            member_name = get_input("Input members username > ")
+            requested_name = get_input("Input requested name > ")
+            member = library.select_user(member_name, "member")
+            admin.update_name(member, requested_name)
+            print(color_text("\nName updated successfully", "green"))
+            library.save()
+
+        elif user_input == 4:
+            member_name = get_input("Input members username > ")
+            requested_id = get_input("Input new ID > ", True)
+            member = library.select_user(member_name, "member")
+            admin.update_id(member, requested_id)
+            print(color_text("\nUser's ID updated successfully", "green"))
+            library.save()
+
+        elif user_input == 5:
+            member_name = get_input("Input username to view log > ")
+            member = library.select_user(member_name, "member")
+            admin.view_member_log(member)
+            time.sleep(2)
+
+        elif user_input == 6:
+            admin.view_global_log()
+            time.sleep(2)
+
+        elif user_input == 7:
+            print(color_text("Exiting admin menu.....", "yellow"))
+            time.sleep(2)
+            break
+
+        else:
+            continue 
 
 member_names = [
     "Chris",
@@ -187,5 +357,11 @@ publication_years = [
     2011
 ]
 
+"""
+for name in member_names:
+    library.register_member(name)
 
+for title, author, pub, genre in zip(book_titles, authors, publication_years, genres):
+    library.add_book(Book(title, author, pub, genre))
+"""
 main_menu()

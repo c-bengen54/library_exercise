@@ -1,6 +1,6 @@
-from models.user import Admin, Member, ADMIN_CODE
+from models.user import Admin, Member, ADMIN_CODE, User
 from datetime import datetime
-import random
+import json, os, random
 
 class Book:
     def __init__(self, title:str, author:str, publication:int, genre:str, checked_out: bool = False):
@@ -47,7 +47,7 @@ class Library:
     def remove_book(self, book:Book):
         self.books.remove(book)
 
-    def register_member(self, member_name:str):
+    def register_member(self, member_name:str) -> Member:
         
         if any(member.name == member_name for member in self.members):
             print("Name has been taken")
@@ -57,22 +57,28 @@ class Library:
             new_member = Member(member_name, member_id)
             self.members.append(new_member)
             new_member.log_event(f"Library registered new member: {member_name} | {datetime.now()}", True)
+            return new_member
 
-    def register_admin(self, admin_name:str, admin_code:int):
-        
-        if admin_code == ADMIN_CODE:
-            if any(admin.name == admin_name for admin in self.admins):
-                print("Name already taken")
-        
-            else:
-                admin_id = random.randint(111111, 999999)
-                unique_admin_code = random.randint(111111, 999999)
-                new_admin = Admin(admin_name, admin_id, unique_admin_code)
-                self.admins.append(new_admin)
-                new_admin.log_event(f"Library registered new admin: {admin_name} | {datetime.now()}", True)
+    def register_admin(self, admin_name, admin_code):
 
-        else:
-            print("Incorrect admin code")
+        if admin_code != ADMIN_CODE:
+            print("Wrong admin code")
+            return None
+
+        if any(admin.name == admin_name for admin in self.admins):
+            print("Duplicate admin name")
+            return None
+
+        admin_id = random.randint(111111, 999999)
+        unique_admin_code = random.randint(111111, 999999)
+
+        new_admin = Admin(admin_name, admin_id, unique_admin_code)
+
+
+        self.admins.append(new_admin)
+        new_admin.log_event(f"Library registered new admin: {admin_name} | {datetime.now()}", True)
+
+        return new_admin
 
     def search_by_title(self, title:str):        
         for book in self.books:
@@ -174,3 +180,120 @@ class Library:
             if book.title == title:
                 return book
         raise ValueError(f"Book not found with title: {title}, or has not yet been registered")
+    
+    def save(self, filepath:str = "library.json"):
+        data = {
+            "books": [],
+            "members": [],
+            "admins": [],
+            "reservation_queue": {},
+            "log": User.global_log
+
+        }
+
+        for book in self.books:
+            data["books"].append({
+                "title": book.title,
+                "author": book.author,
+                "publication": book.publication,
+                "genre": book.genre,
+                "checked_out": book.checked_out,
+                "holder": book.holder.name if book.holder else None
+            })
+
+        for member in self.members:
+            data["members"].append({
+                "name": member.name,
+                "user_id": member.user_id,
+                "borrowed_books":[book.title for book in member.borrowed_books],
+                "reservations":[reservation.title for reservation in member.reservations],
+                "log": member.log,
+            })
+
+        for admin in self.admins:
+            data["admins"].append({
+                "name": admin.name,
+                "user_id": admin.user_id,
+                "admin_id": admin.admin_id,
+                "log": admin.log,
+            })
+
+        for book, people in self.reservation_queue.items():
+            data["reservation_queue"][book.title] = [
+                member.name for member in people
+            ]
+
+        with open(filepath, "w") as file:
+            json.dump(data, file, indent=4)
+        
+    @classmethod
+    def load(cls, filepath):
+        library = cls()
+
+        if not os.path.exists(filepath):
+            raise Exception("File does not exist")
+        
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                save = json.load(f)
+        except Exception as e:
+            raise FileNotFoundError(f"Error happened while loading save {e}")
+        
+        books = {}
+
+        for info in save["books"]:
+            book = Book(info["title"], 
+                        info["author"], 
+                        info["publication"], 
+                        info["genre"], 
+                        info["checked_out"])
+            
+            library.books.append(book)
+            books[book.title] = book
+
+        members = {}
+
+        for info in save["members"]:
+            member = Member(info["name"], info["user_id"])
+
+            member.log = info["log"]
+
+            library.members.append(member)
+
+            members[member.name] = member
+
+        for info in save["members"]:
+            member = members[info["name"]]
+
+            for title in info.get("borrowed_books", []):
+                member.borrowed_books.append(books[title])
+
+            for title in info.get("reservations", []):
+                member.reservations.append(books[title])
+
+        for info in save["books"]:
+            if info["holder"]:
+                books[info["title"]].holder = members[
+                    info["holder"]
+                ]
+
+        for info in save["admins"]:
+            admin = Admin(
+                info["name"],
+                info["user_id"],
+                info["admin_id"]
+            )
+
+            admin.log = info["log"]
+
+            library.admins.append(admin)
+
+        for title, names in save["reservation_queue"].items():
+            library.reservation_queue[books[title]] = [
+                members[name]
+                for name in names
+            ]
+
+        User.global_log = save["log"]
+
+        return library
