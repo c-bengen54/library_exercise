@@ -364,4 +364,3 @@ for name in member_names:
 for title, author, pub, genre in zip(book_titles, authors, publication_years, genres):
     library.add_book(Book(title, author, pub, genre))
 """
-main_menu()
