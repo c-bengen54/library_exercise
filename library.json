@@ -13,8 +13,8 @@
             "author": "Harper Lee",
             "publication": 1960,
             "genre": "Classic",
-            "checked_out": false,
-            "holder": null
+            "checked_out": true,
+            "holder": "Boo"
         },
         {
             "title": "The Hobbit",
@@ -93,8 +93,8 @@
             "author": "Jane Austen",
             "publication": 1813,
             "genre": "Romance",
-            "checked_out": false,
-            "holder": null
+            "checked_out": true,
+            "holder": "Boo"
         },
         {
             "title": "Dracula",
@@ -273,6 +273,26 @@
             "borrowed_books": [],
             "reservations": [],
             "log": []
+        },
+        {
+            "name": "Nelson",
+            "user_id": 760322,
+            "borrowed_books": [],
+            "reservations": [],
+            "log": []
+        },
+        {
+            "name": "Boo",
+            "user_id": 288211,
+            "borrowed_books": [
+                "Pride and Prejudice",
+                "To Kill a Mockingbird"
+            ],
+            "reservations": [],
+            "log": [
+                "Member: Boo checked out title: Pride and Prejudice | 2026-07-12 19:28:49.935447\n",
+                "Member: Boo checked out title: To Kill a Mockingbird | 2026-07-12 19:29:03.191520\n"
+            ]
         }
     ],
     "admins": [
@@ -286,6 +306,18 @@
             "name": "Paul",
             "user_id": 690201,
             "admin_id": 758269,
+            "log": []
+        },
+        {
+            "name": "Sam",
+            "user_id": 770873,
+            "admin_id": 473753,
+            "log": []
+        },
+        {
+            "name": "Pollock",
+            "user_id": 498124,
+            "admin_id": 983257,
             "log": []
         }
     ],
@@ -308,6 +340,12 @@
         "[Global] Library registered new member: Abigail | 2026-07-09 18:10:18.676027\n",
         "[Global] Library registered new admin: Chris | 2026-07-09 18:10:29.913457\n",
         "[Global] Library registered new member: Jackson | 2026-07-09 18:11:40.935806\n",
-        "[Global] Library registered new admin: Paul | 2026-07-09 18:13:03.880321\n"
+        "[Global] Library registered new admin: Paul | 2026-07-09 18:13:03.880321\n",
+        "[Global] Library registered new member: Nelson | 2026-07-10 14:23:08.005744\n",
+        "[Global] Library registered new admin: Sam | 2026-07-10 14:24:43.552884\n",
+        "[Global] Library registered new admin: Pollock | 2026-07-10 15:20:35.963556\n",
+        "[Global] Library registered new member: Boo | 2026-07-12 19:27:16.704513\n",
+        "[Global] Member: Boo checked out title: Pride and Prejudice | 2026-07-12 19:28:49.935507\n",
+        "[Global] Member: Boo checked out title: To Kill a Mockingbird | 2026-07-12 19:29:03.191557\n"
     ]
 }
