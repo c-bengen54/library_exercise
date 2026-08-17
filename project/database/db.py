@@ -1,5 +1,7 @@
 import psycopg
 
+#psql library_db -f schema.sql
+
 conn = psycopg.connect(
     dbname="library_db",
     user="christopherbengen",
@@ -22,6 +24,3 @@ def _fetch_one(query:str, params):
     with conn.cursor() as cur:
         cur.execute(query, params)
         return cur.fetchone()
-    
-def _insert_book(title, author, publication, genre, holder):
-    pass
