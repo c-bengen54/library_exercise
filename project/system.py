@@ -1,10 +1,11 @@
 import time
 import bcrypt
-from models.library import Library, Book
+from models.library import Library, access
+
+code, expiration = access
 
 library = Library()
 salt = bcrypt.gensalt()
-
 
 def get_input(question:str, conversion:bool = False) -> str | int:
     if conversion:
@@ -60,26 +61,29 @@ def main_menu():
             member_login()
             
         elif user_input == 2:
-            admin_login()
+            #admin_login()
+            pass
 
         elif user_input == 3:
             member_name = get_input("\nInput requested name: ")
-            new_member = library.register_member(member_name)
+            m_first_name = get_input("\nInput your first name: ")
+            m_last_name = get_input("\nInput your last name: ")
+            m_email = get_input("\nInput your email: ")
+            password = get_input("\nInput your password")
+            password = bcrypt.hashpw(password.encode(str = "utf-8"), salt)
+            new_member = library.register_member(member_name,m_first_name, m_last_name, m_email, password)
             print("\nAccount registered", color_text(f"\n{new_member}", "green"))
-            library.save()
 
         elif user_input == 4:
             admin_name = get_input("\nInput requested name: ")
             admin_code = get_input("\nInput admin registration code: ", True)
             new_admin = library.register_admin(admin_name, admin_code)
             print("\nAdmin registered", color_text(f"\n{new_admin}", "green"))
-            library.save()
 
         elif user_input ==5:
             print(color_text("\nExiting program...", "yellow"))
             time.sleep(2)
             print(color_text("\n- Have a wonderful day!!\n", "cyan"))
-            library.save()
             break
 
         else:
@@ -89,32 +93,38 @@ def main_menu():
 def member_login():
     username = get_input("\nUsername: ")
     user_id = get_input("\nID: ", True)
+    password = get_input("\nPassword: ")
+    password = password.encode(str = "utf-8")
 
-    for member in library.members:
-        if member.name == username and member.user_id == user_id:
-            print(color_text("\nEntering member menu.....", "yellow"))
-            time.sleep(2)
-            member_menu(member.name)
-            return
+    user = library.select("members", "user_id", user_id)
 
-    print(color_text("\nInvalid username or ID.\n", "red"))
+    if user != None and user[2] == username and user[6] == bcrypt.hashpw(password, salt):
+        print(color_text("\nEntering member menu.....", "yellow"))
+        time.sleep(2)
+        member_menu()
+        return
+    
+    print(color_text("\nInvalid username, ID, or password.\n", "red"))
+
+     
 
 def admin_login():
     username = get_input("\nUsername: ")
     user_id = get_input("\nUser ID: ", True)
     admin_id = get_input("\nAdmin ID: ", True)
-    for admin in library.admins:
-        if admin.name == username and admin.user_id == user_id and admin.admin_id == admin_id:
-            print(color_text("\nEntering admin menu.....", "yellow"))
-            time.sleep(2)
-            admin_menu(admin.name)
-            return
+
+    admin = library.select("admins", "user_id", user_id)
+
+    if admin != None and admin[1] == username and admin_id == code:
+        print(color_text("\nEntering admin menu.....", "yellow"))
+        time.sleep(2)
+        admin_menu()
+        return
     
     print(color_text("\nInvalid username, user ID or admin ID", "red"))
 
-def member_menu(member_name):
-    user = library.select_user(member_name, "member")
 
+def member_menu():
     while True:
         print("\n===== Member Menu =====")
         print("1. Checkout Book")
@@ -129,19 +139,19 @@ def member_menu(member_name):
         user_input  = get_input("> ", True)
 
         if user_input == 1:
+            identity = get_input("Input your user ID > ", True)
             title = get_input("Input title you wish to check out > ")
-            book = library.select_book(title)
-            library.check_out(user, book)
+            book_id = library.search_by_title(title)
+            library.check_out(identity, book_id[0])
             print(color_text("Title sucessfully checked out", "green"))
-            library.save()
             
-
         elif user_input == 2:
+            identity = get_input("Input your user ID > ", True)
             title = get_input("Input title you wish to reserve > ")
-            book = library.select_book(title)
-            library.reserve_book(user, book)
+            book_id = library.search_by_title(title)
+            library.reserve_book(identity, book_id[0])
             print(color_text("Title sucessfully reserved", "green"))
-            library.save()
+             
 
         elif user_input == 3:
             library.list_available_books()
@@ -156,10 +166,10 @@ def member_menu(member_name):
             library.search_by_title(title)
 
         elif user_input == 6:
-            user.list_reservations()
+            print(color_text("Functionality not yet implemented", "red"))
 
         elif user_input == 7:
-            user.list_books()
+            print(color_text("Functionality not yet implemented", "red"))
 
         elif user_input == 8:
             print(color_text("Exiting member menu.....", "yellow"))
@@ -178,9 +188,8 @@ def admin_menu(admin_name):
         print("2. Remove Book")
         print("3. Update User Name")
         print("4. Update User ID")
-        print("5. View Member Log")
-        print("6. View Global Log")
-        print("7. Exit\n")
+        print("5. View Global Log")
+        print("6. Exit\n")
 
         user_input  = get_input("> ", True)
 
@@ -189,42 +198,34 @@ def admin_menu(admin_name):
             author = get_input("Input books author > ")
             publication = get_input("Input Publication Year > ", True)
             genre = get_input("Input book genre > ")
-            book = Book(title, author, publication, genre)
-            library.add_book(book)
+            isbn = get_input("Input the books ISBN code\n(Strict form - ISBN-13: XXX-X-XX-XXXXXX-X) ISBN-10: X-XXX-XXXXX-X\n>")
+            library.add_book(title, author, publication, genre, isbn)
             print(color_text("\nBook added to catalogue successfully", "green"))
-            library.save()
+            
 
         elif user_input == 2:
-            title = get_input("Input title to be removed > ")
-            book_for_removal = library.select_book(title)
-            library.remove_book(book_for_removal)
+            book_id = get_input("Input the book database id > ", True)
+            library.remove_book(book_id)
             print(color_text("\nBook removed from catalogue successfully", "green"))
-            library.save()
+            
 
         elif user_input == 3:
-            member_name = get_input("Input members username > ")
+            member_id = get_input("Input user ID > ")
             requested_name = get_input("Input requested name > ")
-            member = library.select_user(member_name, "member")
-            admin.update_name(member, requested_name)
+            member = library.select("members", "user_id", member_id)
+            member_name = member[2]
+            library.update_user(member_name, requested_name, member_id)
             print(color_text("\nName updated successfully", "green"))
-            library.save()
+            
 
         elif user_input == 4:
-            member_name = get_input("Input members username > ")
+            member_id = get_input("Input users ID > ")
             requested_id = get_input("Input new ID > ", True)
-            member = library.select_user(member_name, "member")
-            admin.update_id(member, requested_id)
+            library.update_user("user_id", requested_id, member_id)
             print(color_text("\nUser's ID updated successfully", "green"))
-            library.save()
-
-        elif user_input == 5:
-            member_name = get_input("Input username to view log > ")
-            member = library.select_user(member_name, "member")
-            admin.view_member_log(member)
-            time.sleep(2)
-
+            
         elif user_input == 6:
-            admin.view_global_log()
+            library.view_logs()
             time.sleep(2)
 
         elif user_input == 7:
@@ -233,156 +234,4 @@ def admin_menu(admin_name):
             break
 
         else:
-            continue 
-
-member_names = [
-    "Chris",
-    "James",
-    "Olivia",
-    "Emma",
-    "Liam",
-    "Noah",
-    "Sophia",
-    "Charlotte",
-    "Benjamin",
-    "Lucas",
-    "Amelia",
-    "Mason",
-    "Evelyn",
-    "Henry",
-    "Abigail"
-]
-
-admin_names = [
-    "Sarah",
-    "Michael",
-    "Daniel",
-    "Victoria",
-    "Anthony",
-    "Grace",
-    "Thomas",
-    "Natalie"
-]
-
-book_titles = [
-    "1984",
-    "To Kill a Mockingbird",
-    "The Hobbit",
-    "Dune",
-    "The Great Gatsby",
-    "The Catcher in the Rye",
-    "The Lord of the Rings",
-    "The Martian",
-    "Jurassic Park",
-    "The Hunger Games",
-    "The Da Vinci Code",
-    "Pride and Prejudice",
-    "Dracula",
-    "Frankenstein",
-    "The Shining",
-    "Harry Potter and the Sorcerer's Stone",
-    "The Name of the Wind",
-    "Mistborn",
-    "The Road",
-    "Ready Player One"
-]
-
-authors = [
-    "George Orwell",
-    "Harper Lee",
-    "J.R.R. Tolkien",
-    "Frank Herbert",
-    "F. Scott Fitzgerald",
-    "J.D. Salinger",
-    "J.R.R. Tolkien",
-    "Andy Weir",
-    "Michael Crichton",
-    "Suzanne Collins",
-    "Dan Brown",
-    "Jane Austen",
-    "Bram Stoker",
-    "Mary Shelley",
-    "Stephen King",
-    "J.K. Rowling",
-    "Patrick Rothfuss",
-    "Brandon Sanderson",
-    "Cormac McCarthy",
-    "Ernest Cline"
-]
-
-genres = [
-    "Dystopian",
-    "Classic",
-    "Fantasy",
-    "Science Fiction",
-    "Classic",
-    "Classic",
-    "Fantasy",
-    "Science Fiction",
-    "Science Fiction",
-    "Young Adult",
-    "Mystery",
-    "Romance",
-    "Horror",
-    "Horror",
-    "Horror",
-    "Fantasy",
-    "Fantasy",
-    "Fantasy",
-    "Post-Apocalyptic",
-    "Science Fiction"
-]
-
-publication_years = [
-    1949,
-    1960,
-    1937,
-    1965,
-    1925,
-    1951,
-    1954,
-    2011,
-    1990,
-    2008,
-    2003,
-    1813,
-    1897,
-    1818,
-    1977,
-    1997,
-    2007,
-    2006,
-    2006,
-    2011
-]
-
-isbns = [
-    "978-0-45-152493-5",  
-    "978-0-06-093546-7",  
-    "978-0-54-792822-7", 
-    "978-0-44-117271-9", 
-    "978-0-74-327356-5",  
-    "978-0-31-676948-8",  
-    "978-0-61-864015-7",  
-    "978-0-55-341802-6",  
-    "978-0-34-553898-7",  
-    "978-0-43-902348-1",  
-    "978-0-30-747427-8",  
-    "978-0-14-143951-8",  
-    "978-0-14-143984-6",  
-    "978-0-14-143947-1",  
-    "978-0-30-774365-7",  
-    "978-0-59-035342-7",  
-    "978-0-75-640474-1",  
-    "978-0-76-535038-1",  
-    "978-0-30-738789-9",  
-    "978-0-30-788744-3",  
-]
-
-"""
-for name in member_names:
-    library.register_member(name)
-
-for title, author, pub, genre, isbn in zip(book_titles, authors, publication_years, genres, isbns):
-    library.add_book(title, author, pub, genre, isbn)
-"""
+            continue

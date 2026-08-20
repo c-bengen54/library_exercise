@@ -1,8 +1,9 @@
 from database.db_book import *
-from database.db_member import db_register_admin, db_register_member, db_log_event, db_find
+from database.db_member import *
 from datetime import datetime
-import random
-ADMIN_CODE = 540146
+import random, secrets
+
+access = initialize_admin_code()
 
 class Library:
 
@@ -12,7 +13,7 @@ class Library:
     def remove_book(self, book_id:int):
         db_delete_book(book_id)
 
-    def register_member(self, member_name:str, m_first_name:str, m_last_name:str, m_email:str, password:str):
+    def register_member(self, username:str, m_first_name:str, m_last_name:str, m_email:str, password:bytes):
 
         while True:
 
@@ -20,17 +21,21 @@ class Library:
             if db_find("members", "user_id", member_id) is None:
                 break
         
-        db_register_member(member_id, member_name, m_first_name, m_last_name, m_email, password)
+        db_register_member(member_id, username, m_first_name, m_last_name, m_email, password)
 
-        db_log_event(member_id, f"Library registered new member: {member_name}", datetime.now())
+        db_log_event(member_id, f"Library registered new member: {username}", datetime.now())
 
-    def register_admin(self, admin_name, admin_code):
+    def register_admin(self, admin_name:str, admin_code:int):
 
-        if admin_code != ADMIN_CODE:
+        if admin_code != access[0]:
             print("Wrong admin code")
             return None
 
-        admin_id = random.randint(100000, 999999)
+        while True:
+        
+            admin_id = random.randint(100000, 999999)
+            if db_find("admins", "user_id", admin_id) is None:
+                break
 
         db_register_admin(admin_name, admin_id)
 
@@ -80,5 +85,11 @@ class Library:
     def select(data:str, query:str, param):
         return db_find(data, query, param)
 
-    def update_user(member_id:int):
-        pass
+    def update_user(change_value:str, new_value, member_id:int):
+        if db_find("members", "user_id", member_id):
+            db_update_member(change_value, new_value, member_id)
+        else:
+            raise Exception("User not found")
+
+    def view_logs():
+        return db_view_logs()

@@ -1,5 +1,7 @@
-from db import _execute, _fetch_one
+from db import _execute, _fetch_one, _fetch_all
 from psycopg import sql
+import secrets
+from datetime import datetime, timedelta, timezone
 
 def db_register_member(user_id, username, firstname, lastname, email, password):
     _execute(
@@ -52,3 +54,71 @@ def db_log_event(member_id, message, timestamp):
         """,
         (member_id, message, timestamp)
     )
+
+def db_view_logs():
+    return _fetch_all(
+        """
+        SELECT * from logs;
+        """
+    )
+
+def db_get_admin_code():
+    return _fetch_one(
+        """
+        SELECT access_code, expires_at
+        from admin_access
+        where id = 1;
+        """
+    )
+
+def db_set_admin_code(access_code:int, expiration):
+    _execute(
+        """
+        INSERT INTO admin_access (access_code, expires_at)
+        VALUES (%s, %s);
+        """,
+        (access_code, expiration)
+    )
+
+CODE_INTERVAL = 30
+
+def gen_admin_code():
+    return secrets.randbelow(900000) + 100000
+
+def get_next_expiration():
+    now = datetime.now(timezone.utc)
+    minute = now.minute
+    next_minute = ((minute//CODE_INTERVAL)+1)*CODE_INTERVAL
+
+    if next_minute >= 60:
+        expiration = now.replace(
+            minute=0,
+            second=0,
+            microsecond=0
+        ) + timedelta(hours=1)
+    else:
+        expiration = now.replace(
+            minute=next_minute,
+            second=0,
+            microsecond=0
+        )
+
+    return expiration
+
+def initialize_admin_code():
+    result = db_get_admin_code()
+
+    if result == None:
+        code = gen_admin_code()
+        expiration = get_next_expiration()
+        db_set_admin_code(code, expiration)
+        return code, expiration
+
+    code, expiration = result
+
+    if datetime.now(timezone.utc) >= expiration:
+        code = gen_admin_code()
+        expiration = get_next_expiration()
+        db_set_admin_code(code, expiration)
+
+    return code, expiration

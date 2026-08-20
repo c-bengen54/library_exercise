@@ -109,3 +109,9 @@ CREATE TABLE IF NOT EXISTS reservations (
 
     UNIQUE(book_id, member_id)
 );
+
+CREATE TABLE IF NOT EXISTS admin_access (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    access_code INTEGER NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL
+);
