@@ -49,7 +49,7 @@ def db_find(database, query, value):
 def db_log_event(member_id, message, timestamp):
     _execute(
         """
-        INSERT INTO logs (member_id, log_message, created_at)
+        INSERT INTO logs (user_id, log_message, created_at)
         VALUES (%s, %s, %s);
         """,
         (member_id, message, timestamp)
@@ -76,6 +76,18 @@ def db_set_admin_code(access_code:int, expiration):
         """
         INSERT INTO admin_access (id, access_code, expires_at)
         VALUES (1, %s, %s);
+        """,
+        (access_code, expiration)
+    )
+
+def db_update_admin_code(access_code:int, expiration):
+    _execute(
+        """
+        UPDATE admin_access
+        SET 
+            access_code = %s,
+            expires_at = %s
+        WHERE id = 1;
         """,
         (access_code, expiration)
     )
@@ -119,6 +131,6 @@ def initialize_admin_code():
     if datetime.now(timezone.utc) >= expiration:
         code = gen_admin_code()
         expiration = get_next_expiration()
-        db_set_admin_code(code, expiration)
+        db_update_admin_code(code, expiration)
 
     return code, expiration

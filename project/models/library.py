@@ -34,7 +34,7 @@ class Library:
         while True:
         
             admin_id = random.randint(100000, 999999)
-            if db_find("admins", "user_id", admin_id) is None:
+            if db_find("admins", "admin_id", admin_id) is None:
                 break
 
         db_register_admin(admin_name, admin_id)
@@ -82,14 +82,14 @@ class Library:
 
         db_log_event(member_id, f"Member: {member_id} returned title: {book_id}", datetime.now())
 
-    def select(data:str, query:str, param):
+    def select(self, data:str, query:str, param):
         return db_find(data, query, param)
 
-    def update_user(change_value:str, new_value, member_id:int):
+    def update_user(self, change_value:str, new_value, member_id:int):
         if db_find("members", "user_id", member_id):
             db_update_member(change_value, new_value, member_id)
         else:
             raise Exception("User not found")
 
-    def view_logs():
+    def view_logs(self):
         return db_view_logs()

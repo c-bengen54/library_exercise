@@ -5,7 +5,6 @@ from models.library import Library, access
 code, expiration = access
 
 library = Library()
-salt = bcrypt.gensalt()
 
 def get_input(question:str, conversion:bool = False) -> str | int:
     if conversion:
@@ -24,7 +23,7 @@ def get_input(question:str, conversion:bool = False) -> str | int:
             try:
                 user_input = input(question)
                 break
-            except (KeyboardInterrupt, EOFError, ValueError):
+            except (KeyboardInterrupt, EOFError):
                 print(color_text("\nIncorrect input type, please try again\n", "red"))
                 continue
         return user_input
@@ -61,7 +60,7 @@ def main_menu():
             member_login()
             
         elif user_input == 2:
-            #admin_login()
+            admin_login()
             pass
 
         elif user_input == 3:
@@ -69,16 +68,16 @@ def main_menu():
             m_first_name = get_input("\nInput your first name: ")
             m_last_name = get_input("\nInput your last name: ")
             m_email = get_input("\nInput your email: ")
-            password = get_input("\nInput your password")
-            password = bcrypt.hashpw(password.encode("utf-8"), salt)
-            new_member = library.register_member(member_name,m_first_name, m_last_name, m_email, password)
-            print("\nAccount registered", color_text(f"\n{new_member}", "green"))
+            password = get_input("\nInput your password: ")
+            password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+            library.register_member(member_name,m_first_name, m_last_name, m_email, password)
+            print("\nAccount registered", color_text(f"\n{member_name}", "green"))
 
         elif user_input == 4:
             admin_name = get_input("\nInput requested name: ")
             admin_code = get_input("\nInput admin registration code: ", True)
-            new_admin = library.register_admin(admin_name, admin_code)
-            print("\nAdmin registered", color_text(f"\n{new_admin}", "green"))
+            library.register_admin(admin_name, admin_code)
+            print("\nAdmin registered", color_text(f"\n{admin_name}", "green"))
 
         elif user_input ==5:
             print(color_text("\nExiting program...", "yellow"))
@@ -94,35 +93,46 @@ def member_login():
     username = get_input("\nUsername: ")
     user_id = get_input("\nID: ", True)
     password = get_input("\nPassword: ")
-    password = password.encode(str = "utf-8")
+    password = password.encode("utf-8")
 
     user = library.select("members", "user_id", user_id)
 
-    if user != None and user[2] == username and user[6] == bcrypt.hashpw(password, salt):
-        print(color_text("\nEntering member menu.....", "yellow"))
-        time.sleep(2)
-        member_menu()
-        return
-    
-    print(color_text("\nInvalid username, ID, or password.\n", "red"))
+    stored_hash = bytes.fromhex(user[6][2:])
 
-     
+    if user is None:
+        print(color_text("\nNo user found.\n", "red"))
+        return
+
+    if user[1] != user_id:
+        print(color_text("\nInvalid user ID.\n", "red"))
+        return
+
+    if user[2] != username:
+        print(color_text("\nInvalid username.\n", "red"))
+        return
+
+    if not bcrypt.checkpw(password, stored_hash):
+        print(color_text("\nInvalid password.\n", "red"))
+        return
+
+    print(color_text("\nEntering member menu.....", "yellow"))
+    time.sleep(2)
+    member_menu()
+    return
 
 def admin_login():
     username = get_input("\nUsername: ")
-    user_id = get_input("\nUser ID: ", True)
     admin_id = get_input("\nAdmin ID: ", True)
+    access_code = get_input("\nAccess Code: ", True)
+    admin = library.select("admins", "admin_id", admin_id)
 
-    admin = library.select("admins", "user_id", user_id)
-
-    if admin != None and admin[1] == username and admin_id == code:
+    if admin != None and admin[1] == username and access_code == code and admin_id == admin[2]:
         print(color_text("\nEntering admin menu.....", "yellow"))
         time.sleep(2)
         admin_menu()
         return
     
     print(color_text("\nInvalid username, user ID or admin ID", "red"))
-
 
 def member_menu():
     while True:
@@ -141,15 +151,25 @@ def member_menu():
         if user_input == 1:
             identity = get_input("Input your user ID > ", True)
             title = get_input("Input title you wish to check out > ")
-            book_id = library.search_by_title(title)
-            library.check_out(identity, book_id[0])
+            book = library.search_by_title(title)
+
+            if book is None:
+                print(color_text("\nBook not found.\n", "red"))
+                continue
+
+            library.check_out(identity, book[0])
             print(color_text("Title sucessfully checked out", "green"))
             
         elif user_input == 2:
             identity = get_input("Input your user ID > ", True)
             title = get_input("Input title you wish to reserve > ")
-            book_id = library.search_by_title(title)
-            library.reserve_book(identity, book_id[0])
+            book = library.search_by_title(title)
+
+            if book is None:
+                print(color_text("\nBook not found.\n", "red"))
+                continue
+
+            library.reserve_book(identity, book[0])
             print(color_text("Title sucessfully reserved", "green"))
              
 
@@ -179,9 +199,7 @@ def member_menu():
         else:
             continue
 
-def admin_menu(admin_name):
-    admin = library.select_user(admin_name, "admin")
-    
+def admin_menu():    
     while True:
         print("\n===== Admin Menu =====")
         print("1. Add Book")
@@ -224,11 +242,11 @@ def admin_menu(admin_name):
             library.update_user("user_id", requested_id, member_id)
             print(color_text("\nUser's ID updated successfully", "green"))
             
-        elif user_input == 6:
+        elif user_input == 5:
             library.view_logs()
             time.sleep(2)
 
-        elif user_input == 7:
+        elif user_input == 6:
             print(color_text("Exiting admin menu.....", "yellow"))
             time.sleep(2)
             break
