@@ -1,4 +1,4 @@
-from db import _execute, _fetch_one, _fetch_all
+from database.db import _execute, _fetch_one, _fetch_all
 from psycopg import sql
 
 def db_add_book(title, author, publication, genre, isbn):

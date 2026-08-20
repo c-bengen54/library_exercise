@@ -70,7 +70,7 @@ def main_menu():
             m_last_name = get_input("\nInput your last name: ")
             m_email = get_input("\nInput your email: ")
             password = get_input("\nInput your password")
-            password = bcrypt.hashpw(password.encode(str = "utf-8"), salt)
+            password = bcrypt.hashpw(password.encode("utf-8"), salt)
             new_member = library.register_member(member_name,m_first_name, m_last_name, m_email, password)
             print("\nAccount registered", color_text(f"\n{new_member}", "green"))
 

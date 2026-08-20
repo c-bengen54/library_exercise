@@ -1,3 +1,19 @@
-🔴 Finish reservation handling in return_book().
-🟠 Make isbn_code a str. (Done)
-🟢 Decide where/how database rows become Book/Member objects.
+library_exercise/
+│
+│
+└── project/
+        │
+        ├── database/
+        │      │
+        │      ├── db_book.py
+        │      ├── db_member.py
+        │      ├── db.py
+        │
+        ├── models/
+        │     │
+        │     library.py 
+        │
+        ├── main.py
+        ├── system.py
+        ├── venv/
+        ├── schema.sql

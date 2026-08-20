@@ -1,4 +1,4 @@
-from db import _execute, _fetch_one, _fetch_all
+from database.db import _execute, _fetch_one, _fetch_all
 from psycopg import sql
 import secrets
 from datetime import datetime, timedelta, timezone
@@ -74,8 +74,8 @@ def db_get_admin_code():
 def db_set_admin_code(access_code:int, expiration):
     _execute(
         """
-        INSERT INTO admin_access (access_code, expires_at)
-        VALUES (%s, %s);
+        INSERT INTO admin_access (id, access_code, expires_at)
+        VALUES (1, %s, %s);
         """,
         (access_code, expiration)
     )
