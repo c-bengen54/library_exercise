@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS admins (
 
 CREATE TABLE IF NOT EXISTS logs (
     id SERIAL PRIMARY KEY,
-    member_id INTEGER REFERENCES members(id),
+    user_id INTEGER REFERENCES members(user_id),
     log_message TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -85,12 +85,12 @@ CREATE TABLE IF NOT EXISTS books (
     genre TEXT,
     isbn_code VARCHAR(17) UNIQUE NOT NULL,
     checked_out BOOLEAN DEFAULT FALSE,
-    holder_id INTEGER REFERENCES members(id),
+    holder_id INTEGER REFERENCES members(user_id),
     CONSTRAINT check_isbn CHECK(fn_isbn(isbn_code))
 );
 
 CREATE TABLE IF NOT EXISTS borrowed_books (
-    member_id INTEGER REFERENCES members(id),
+    member_id INTEGER REFERENCES members(user_id),
     book_id INTEGER REFERENCES books(id),
     borrowed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(member_id, book_id)
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS reservations (
         REFERENCES books(id),
 
     member_id INTEGER NOT NULL
-        REFERENCES members(id),
+        REFERENCES members(user_id),
 
     reserved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 

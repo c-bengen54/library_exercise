@@ -1,15 +1,16 @@
 from db import _execute, _fetch_one
+from psycopg import sql
 
-def register_member(user_id, username, firstname, lastname, email, password):
+def db_register_member(user_id, username, firstname, lastname, email, password):
     _execute(
         """
         INSERT INTO members (user_id, username, first_name, last_name, email, password_hash)
-        VALUES (%s, %s, %s, %s, %s);
+        VALUES (%s, %s, %s, %s, %s, %s);
         """,
         (user_id, username, firstname, lastname, email, password)
     )
 
-def register_admin(username, admin_id):
+def db_register_admin(username, admin_id):
     _execute(
         """
         INSERT INTO admins (username, admin_id)
@@ -18,22 +19,36 @@ def register_admin(username, admin_id):
         (username, admin_id)
     )
 
-def update_member(query, value, user_id):
-    _execute(
+def db_update_member(query, value, user_id):
+    statement = sql.SQL(
         """
         UPDATE members
         SET
-            %s = %s
+            {} = %s
         where user_id = %s;
-        """,
-        (query, value, user_id)
-    )
-
-def find_user(database, user_id):
-    return _fetch_one(
         """
-        SELECT * from %s
-        where id = %s;
+    ).format(
+        sql.Identifier(query)
+    )
+    _execute(statement, (value, user_id,))
+
+def db_find(database, query, value):
+    statement = sql.SQL(
+        """
+        SELECT * from {}
+        where {} = %s;
+        """
+    ).format(
+        sql.Identifier(database),
+        sql.Identifier(query)
+    )
+    return _fetch_one(statement, (value,))
+
+def db_log_event(member_id, message, timestamp):
+    _execute(
+        """
+        INSERT INTO logs (member_id, log_message, created_at)
+        VALUES (%s, %s, %s);
         """,
-        (database, user_id)
+        (member_id, message, timestamp)
     )

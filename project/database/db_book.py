@@ -1,6 +1,7 @@
 from db import _execute, _fetch_one, _fetch_all
+from psycopg import sql
 
-def add_book(title, author, publication, genre, isbn):
+def db_add_book(title, author, publication, genre, isbn):
     _execute(
         """
         INSERT INTO books (title, author, publication, genre, isbn_code)
@@ -9,17 +10,24 @@ def add_book(title, author, publication, genre, isbn):
         (title, author, publication, genre, isbn,)
     )
 
-def get_book(title):
-    return _fetch_one(
+def db_get_book_by(query, param):
+    """
+    Query must match column name, and the param type must match query
+    i.e. id query must have integer param and title query must have text based param
+    """
+
+    statement = sql.SQL(
         """
         SELECT *
         from books
-        WHERE title = %s;
-        """,
-        (title,)
+        WHERE {} = %s
+        """
+    ).format(
+        sql.Identifier(query)
     )
+    return _fetch_one(statement, (param,))
 
-def delete_book(book_id):
+def db_delete_book(book_id):
     _execute(
         """
         DELETE from books
@@ -28,9 +36,11 @@ def delete_book(book_id):
         (book_id,)
     )
 
-def check_out(member_id, book_id):
+def db_check_out(member_id, book_id):
     _execute(
         """
+        BEGIN TRANSACTION;
+
         UPDATE books
         SET
             checked_out = TRUE,
@@ -39,11 +49,13 @@ def check_out(member_id, book_id):
 
         INSERT INTO borrowed_books (member_id, book_id)
         VALUES (%s, %s);
+
+        COMMIT;
         """,
         (member_id, book_id, member_id, book_id)
     )
 
-def return_book(book_id):
+def db_return_book(book_id):
     _execute(
         """
         UPDATE books
@@ -57,7 +69,7 @@ def return_book(book_id):
         (book_id, book_id,)
     )
 
-def reserve_book(book_id, member_id):
+def db_reserve_book(book_id, member_id):
     _execute(
         """
         INSERT INTO reservations (book_id, member_id)
@@ -66,7 +78,7 @@ def reserve_book(book_id, member_id):
         (book_id, member_id,)
     )
 
-def get_reservation(book_id):
+def db_get_reservation(book_id):
     return _fetch_all(
         """
         SELECT * 
@@ -77,7 +89,7 @@ def get_reservation(book_id):
         (book_id,)
     )
 
-def cancel_reservation(book_id, member_id):
+def db_cancel_reservation(book_id, member_id):
     _execute(
         """
         DELETE FROM reservations
@@ -89,15 +101,16 @@ def cancel_reservation(book_id, member_id):
         (book_id, member_id,)
     )
 
-def get_all_books():
+def db_get_all_books():
     return _fetch_all(
         """
         SELECT *
-        from books;
+        from books
+        WHERE checked_out = FALSE;
         """
         )
 
-def is_checked_out(book_id):
+def db_is_checked_out(book_id):
     return _fetch_one(
         """
         SELECT checked_out
@@ -107,7 +120,7 @@ def is_checked_out(book_id):
         (book_id,)
     )
 
-def get_holder(book_id):
+def db_get_holder(book_id):
     return _fetch_one(
         """
         SELECT holder_id
@@ -210,29 +223,29 @@ publication_years = [
 ]
 
 isbns = [
-    "978-0-45-152493-5",  # 1984
-    "978-0-06-093546-7",  # To Kill a Mockingbird
-    "978-0-54-792822-7",  # The Hobbit
-    "978-0-44-117271-9",  # Dune
-    "978-0-74-327356-5",  # The Great Gatsby
-    "978-0-31-676948-8",  # The Catcher in the Rye
-    "978-0-61-864015-7",  # The Lord of the Rings
-    "978-0-55-341802-6",  # The Martian
-    "978-0-34-553898-7",  # Jurassic Park
-    "978-0-43-902348-1",  # The Hunger Games
-    "978-0-30-747427-8",  # The Da Vinci Code
-    "978-0-14-143951-8",  # Pride and Prejudice
-    "978-0-14-143984-6",  # Dracula
-    "978-0-14-143947-1",  # Frankenstein
-    "978-0-30-774365-7",  # The Shining
-    "978-0-59-035342-7",  # Harry Potter and the Sorcerer's Stone
-    "978-0-75-640474-1",  # The Name of the Wind
-    "978-0-76-535038-1",  # Mistborn
-    "978-0-30-738789-9",  # The Road
-    "978-0-30-788744-3",  # Ready Player One
+    "978-0-45-152493-5",  
+    "978-0-06-093546-7",  
+    "978-0-54-792822-7", 
+    "978-0-44-117271-9", 
+    "978-0-74-327356-5",  
+    "978-0-31-676948-8",  
+    "978-0-61-864015-7",  
+    "978-0-55-341802-6",  
+    "978-0-34-553898-7",  
+    "978-0-43-902348-1",  
+    "978-0-30-747427-8",  
+    "978-0-14-143951-8",  
+    "978-0-14-143984-6",  
+    "978-0-14-143947-1",  
+    "978-0-30-774365-7",  
+    "978-0-59-035342-7",  
+    "978-0-75-640474-1",  
+    "978-0-76-535038-1",  
+    "978-0-30-738789-9",  
+    "978-0-30-788744-3",  
 ]
 
 """
 for title, author, pub, genre, isbn in zip(book_titles, authors, publication_years, genres, isbns):
-    add_book(title, author, pub, genre, isbn)
+    db_add_book(title, author, pub, genre, isbn)
 """

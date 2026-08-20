@@ -1,11 +1,10 @@
-import os, time
-
+import time
+import bcrypt
 from models.library import Library, Book
 
-if os.path.exists("library.json"):
-    library = Library().load("library.json")
-else:
-    library = Library()
+library = Library()
+salt = bcrypt.gensalt()
+
 
 def get_input(question:str, conversion:bool = False) -> str | int:
     if conversion:
@@ -357,10 +356,33 @@ publication_years = [
     2011
 ]
 
+isbns = [
+    "978-0-45-152493-5",  
+    "978-0-06-093546-7",  
+    "978-0-54-792822-7", 
+    "978-0-44-117271-9", 
+    "978-0-74-327356-5",  
+    "978-0-31-676948-8",  
+    "978-0-61-864015-7",  
+    "978-0-55-341802-6",  
+    "978-0-34-553898-7",  
+    "978-0-43-902348-1",  
+    "978-0-30-747427-8",  
+    "978-0-14-143951-8",  
+    "978-0-14-143984-6",  
+    "978-0-14-143947-1",  
+    "978-0-30-774365-7",  
+    "978-0-59-035342-7",  
+    "978-0-75-640474-1",  
+    "978-0-76-535038-1",  
+    "978-0-30-738789-9",  
+    "978-0-30-788744-3",  
+]
+
 """
 for name in member_names:
     library.register_member(name)
 
-for title, author, pub, genre in zip(book_titles, authors, publication_years, genres):
-    library.add_book(Book(title, author, pub, genre))
+for title, author, pub, genre, isbn in zip(book_titles, authors, publication_years, genres, isbns):
+    library.add_book(title, author, pub, genre, isbn)
 """
