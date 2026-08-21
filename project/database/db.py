@@ -1,7 +1,5 @@
 import psycopg
 
-#psql library_db -f schema.sql
-
 conn = psycopg.connect(
     dbname="library_db",
     user="christopherbengen",
