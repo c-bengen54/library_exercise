@@ -8,3 +8,6 @@ venv/
 
 # macOS
 .DS_Store
+
+#Environment
+.env
