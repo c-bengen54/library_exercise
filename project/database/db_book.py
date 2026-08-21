@@ -126,11 +126,17 @@ def db_return_book(book_id):
         SET 
             checked_out = FALSE,
             holder_id = NULL
-        where id = %s;
-        DELETE FROM borrowed_books
-        where book_id = %s
+        WHERE id = %s;
         """,
-        (book_id, book_id,)
+        (book_id,)
+    )
+
+    _execute(
+        """
+        DELETE FROM borrowed_books
+        WHERE book_id = %s;
+        """,
+        (book_id,)
     )
 
 def db_reserve_book(book_id, member_id):

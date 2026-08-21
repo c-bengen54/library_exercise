@@ -1,11 +1,12 @@
+import os
 import psycopg
 
 conn = psycopg.connect(
-    dbname="library_db",
-    user="christopherbengen",
-    password="5401",
-    host="localhost",
-    port=5432
+    dbname=os.getenv("DB_NAME"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    host=os.getenv("DB_HOST"),
+    port=os.getenv("DB_PORT")
 )
 
 def _execute(query: str, params=None):

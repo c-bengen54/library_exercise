@@ -295,19 +295,17 @@ def admin_menu():
             book_id = get_input("Input the book database id > ", True)
             library.remove_book(book_id)
             print(color_text("\nBook removed from catalogue successfully", "green"))
-            
 
+            
         elif user_input == 3:
-            member_id = get_input("Input user ID > ")
+            member_id = get_input("Input user ID > ", True)
             requested_name = get_input("Input requested name > ")
-            member = library.select("users", "user_id", member_id)
-            member_name = member[2]
-            library.update_user(member_name, requested_name, member_id)
+            library.update_user("username", requested_name, member_id)
             print(color_text("\nName updated successfully", "green"))
             
 
         elif user_input == 4:
-            member_id = get_input("Input users ID > ")
+            member_id = get_input("Input users ID > ", True)
             requested_id = get_input("Input new ID > ", True)
             library.update_user("user_id", requested_id, member_id)
             print(color_text("\nUser's ID updated successfully", "green"))
