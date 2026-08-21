@@ -7,6 +7,25 @@ code, expiration = access
 library = Library()
 
 def get_input(question:str, conversion:bool = False) -> str | int:
+    """
+    Gets user input and returns the value entered
+
+    Parameters:
+        question (str):
+            The flavor text meant to tell the user
+            what they're meant to answer
+        
+        conversion (bool):
+            The flag which determines whether the input will be 
+            converted to an integer value.
+            - Should only be used if the input type is expected to be an integer value
+    
+    Returns:
+        str | int:
+            Returns the string value of what the user inputted,
+            or an integer if the input was converted
+
+    """
     if conversion:
         while True:
             try:
@@ -29,7 +48,30 @@ def get_input(question:str, conversion:bool = False) -> str | int:
         return user_input
 
 def color_text(text:str, color:str = "end") -> str:
-    """Return a colorized string of text"""
+    """
+    Return a colorized string of text.
+
+    Parameters:
+        text (str):
+            The string to be colored
+
+        color (str):
+            The color you wish to color the text as, defaults to end
+            Supported colors include:
+            - bold
+            - red
+            - green
+            - yellow
+            - blue
+            - magenta
+            - cyan
+            - white
+            - italic
+            - end
+    Returns:
+        str:
+            A colorized string
+    """
     colors = {
         "bold": "\033[1m",
         "red": "\033[31m",
@@ -70,8 +112,8 @@ def main_menu():
             m_email = get_input("\nInput your email: ")
             password = get_input("\nInput your password: ")
             password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-            library.register_user(member_name,m_first_name, m_last_name, m_email, password, "member")
-            print("\nAccount registered", color_text(f"\n{member_name}", "green"))
+            u_id = library.register_user(member_name,m_first_name, m_last_name, m_email, password, "member")
+            print("\nAccount registered", color_text(f"\n{member_name} ID: {u_id}", "green"))
 
         elif user_input == 4:
             admin_name = get_input("\nInput requested name: ")
@@ -82,8 +124,8 @@ def main_menu():
             password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
             admin_code = get_input("\nInput admin registration code: ", True)
 
-            library.register_user(admin_name, a_first_name, a_last_name, a_email, password, "admin", admin_code)
-            print("\nAdmin registered", color_text(f"\n{admin_name}", "green"))
+            u_id = library.register_user(admin_name, a_first_name, a_last_name, a_email, password, "admin", admin_code)
+            print("\nAdmin registered", color_text(f"\n{admin_name} ID: {u_id}", "green"))
 
         elif user_input ==5:
             print(color_text("\nExiting program...", "yellow"))

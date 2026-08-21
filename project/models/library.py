@@ -67,8 +67,8 @@ class Library:
                 user_type is "admin". Defaults to None.
 
         Returns:
-            None:
-                If registration is successful.
+            int:
+                If registration is successful, returns the member ID.
 
             None:
                 If an invalid administrator code is provided.
@@ -84,6 +84,8 @@ class Library:
         db_register_user(member_id, username, m_first_name, m_last_name, m_email, password_hash, user_type)
 
         db_log_event(member_id, f"Library registered new user: {username} | User Type: {user_type}", datetime.now(timezone.utc))
+
+        return member_id
 
     def search_by_title(self, title:str):  
         """

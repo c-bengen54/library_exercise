@@ -93,20 +93,20 @@ def db_check_out(member_id, book_id):
     """
     _execute(
         """
-        BEGIN TRANSACTION;
-
         UPDATE books
         SET
             checked_out = TRUE,
             holder_id = %s
         WHERE id = %s;
-
+        """,
+        (member_id, book_id)
+    )
+    _execute(
+        """
         INSERT INTO borrowed_books (member_id, book_id)
         VALUES (%s, %s);
-
-        COMMIT;
         """,
-        (member_id, book_id, member_id, book_id)
+        (member_id, book_id)
     )
 
 def db_return_book(book_id):
