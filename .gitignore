@@ -11,3 +11,6 @@ venv/
 
 #Environment
 .env
+
+#Extra Files
+library_backup.sql

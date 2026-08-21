@@ -5,6 +5,9 @@ import psycopg, os
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BASE_DIR / ".env")
 
+conn = psycopg.connect(os.getenv("DATABASE_URL"))
+
+"""
 conn = psycopg.connect(
     dbname=os.getenv("DB_NAME"),
     user=os.getenv("DB_USER"),
@@ -12,6 +15,7 @@ conn = psycopg.connect(
     host=os.getenv("DB_HOST"),
     port=os.getenv("DB_PORT")
 )
+"""
 
 def _execute(query: str, params=None):
     with conn.cursor() as cur:
