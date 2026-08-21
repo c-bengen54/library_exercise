@@ -70,13 +70,19 @@ def main_menu():
             m_email = get_input("\nInput your email: ")
             password = get_input("\nInput your password: ")
             password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-            library.register_member(member_name,m_first_name, m_last_name, m_email, password)
+            library.register_user(member_name,m_first_name, m_last_name, m_email, password, "member")
             print("\nAccount registered", color_text(f"\n{member_name}", "green"))
 
         elif user_input == 4:
             admin_name = get_input("\nInput requested name: ")
+            a_first_name = get_input("\nInput your first name: ")
+            a_last_name = get_input("\nInput your last name: ")
+            a_email = get_input("\nInput your email: ")
+            password = get_input("\nInput your password: ")
+            password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
             admin_code = get_input("\nInput admin registration code: ", True)
-            library.register_admin(admin_name, admin_code)
+
+            library.register_user(admin_name, a_first_name, a_last_name, a_email, password, "admin", admin_code)
             print("\nAdmin registered", color_text(f"\n{admin_name}", "green"))
 
         elif user_input ==5:
@@ -95,13 +101,11 @@ def member_login():
     password = get_input("\nPassword: ")
     password = password.encode("utf-8")
 
-    user = library.select("members", "user_id", user_id)
-
-    stored_hash = bytes.fromhex(user[6][2:])
+    user = library.select("users", "user_id", user_id)
 
     if user is None:
-        print(color_text("\nNo user found.\n", "red"))
-        return
+            print(color_text("\nNo user found.\n", "red"))
+            return
 
     if user[1] != user_id:
         print(color_text("\nInvalid user ID.\n", "red"))
@@ -110,6 +114,8 @@ def member_login():
     if user[2] != username:
         print(color_text("\nInvalid username.\n", "red"))
         return
+
+    stored_hash = bytes.fromhex(user[6][2:])
 
     if not bcrypt.checkpw(password, stored_hash):
         print(color_text("\nInvalid password.\n", "red"))
@@ -123,17 +129,39 @@ def member_login():
 def admin_login():
     username = get_input("\nUsername: ")
     admin_id = get_input("\nAdmin ID: ", True)
+    password = get_input("\nPassword: ")
+    password = password.encode("utf-8")
     access_code = get_input("\nAccess Code: ", True)
-    admin = library.select("admins", "admin_id", admin_id)
 
-    if admin != None and admin[1] == username and access_code == code and admin_id == admin[2]:
-        print(color_text("\nEntering admin menu.....", "yellow"))
-        time.sleep(2)
-        admin_menu()
+    admin = library.select("users", "user_id", admin_id)
+
+    if admin is None :
+        print(color_text("\nNo user found.\n", "red"))
         return
     
-    print(color_text("\nInvalid username, user ID or admin ID", "red"))
+    if access_code != code:
+        print(color_text("\nInvalid access code.\n", "red"))
+        return
+    
+    if admin[2] != username:
+        print(color_text("\nInvalid username.\n", "red"))
+        return
+    
+    if admin_id != admin[1]:
+        print(color_text("\nInvalid admin ID.\n", "red"))
+        return
 
+    stored_hash = bytes.fromhex(admin[6][2:])
+
+    if not bcrypt.checkpw(password, stored_hash):
+        print(color_text("\nInvalid password.\n", "red"))
+        return 
+
+    print(color_text("\nEntering admin menu.....", "yellow"))
+    time.sleep(2)
+    admin_menu()
+    return
+    
 def member_menu():
     while True:
         print("\n===== Member Menu =====")
@@ -230,7 +258,7 @@ def admin_menu():
         elif user_input == 3:
             member_id = get_input("Input user ID > ")
             requested_name = get_input("Input requested name > ")
-            member = library.select("members", "user_id", member_id)
+            member = library.select("users", "user_id", member_id)
             member_name = member[2]
             library.update_user(member_name, requested_name, member_id)
             print(color_text("\nName updated successfully", "green"))

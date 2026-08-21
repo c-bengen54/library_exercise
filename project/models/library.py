@@ -1,6 +1,6 @@
 from database.db_book import *
 from database.db_member import *
-from datetime import datetime
+from datetime import datetime, timezone
 import random, secrets
 
 access = initialize_admin_code()
@@ -13,33 +13,19 @@ class Library:
     def remove_book(self, book_id:int):
         db_delete_book(book_id)
 
-    def register_member(self, username:str, m_first_name:str, m_last_name:str, m_email:str, password:bytes):
+    def register_user(self, username:str, m_first_name:str, m_last_name:str, m_email:str, password:bytes, user_type:str, admin_code:int = None):
 
-        while True:
-
-            member_id = random.randint(100000, 999999)
-            if db_find("members", "user_id", member_id) is None:
-                break
-        
-        db_register_member(member_id, username, m_first_name, m_last_name, m_email, password)
-
-        db_log_event(member_id, f"Library registered new member: {username}", datetime.now())
-
-    def register_admin(self, admin_name:str, admin_code:int):
-
-        if admin_code != access[0]:
-            print("Wrong admin code")
+        if user_type.lower().strip() == "admin" and admin_code != access[0]:
             return None
 
         while True:
-        
-            admin_id = random.randint(100000, 999999)
-            if db_find("admins", "admin_id", admin_id) is None:
+            member_id = random.randint(100000, 999999)
+            if db_find("users", "user_id", member_id) is None:
                 break
+        
+        db_register_user(member_id, username, m_first_name, m_last_name, m_email, password, user_type)
 
-        db_register_admin(admin_name, admin_id)
-
-        db_log_event(admin_id, f"Library registered new admin: {admin_name}", datetime.now() )
+        db_log_event(member_id, f"Library registered new user: {username} | User Type: {user_type}", datetime.now(timezone.utc))
 
     def search_by_title(self, title:str):        
         return db_get_book_by("title", title)
@@ -86,7 +72,7 @@ class Library:
         return db_find(data, query, param)
 
     def update_user(self, change_value:str, new_value, member_id:int):
-        if db_find("members", "user_id", member_id):
+        if db_find("users", "user_id", member_id):
             db_update_member(change_value, new_value, member_id)
         else:
             raise Exception("User not found")

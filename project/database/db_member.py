@@ -3,28 +3,19 @@ from psycopg import sql
 import secrets
 from datetime import datetime, timedelta, timezone
 
-def db_register_member(user_id, username, firstname, lastname, email, password):
+def db_register_user(user_id, username, firstname, lastname, email, password, user_type):
     _execute(
         """
-        INSERT INTO members (user_id, username, first_name, last_name, email, password_hash)
-        VALUES (%s, %s, %s, %s, %s, %s);
+        INSERT INTO users (user_id, username, first_name, last_name, email, password_hash, user_type)
+        VALUES (%s, %s, %s, %s, %s, %s, %s);
         """,
-        (user_id, username, firstname, lastname, email, password)
-    )
-
-def db_register_admin(username, admin_id):
-    _execute(
-        """
-        INSERT INTO admins (username, admin_id)
-        VALUES (%s, %s);
-        """,
-        (username, admin_id)
+        (user_id, username, firstname, lastname, email, password, user_type)
     )
 
 def db_update_member(query, value, user_id):
     statement = sql.SQL(
         """
-        UPDATE members
+        UPDATE users
         SET
             {} = %s
         where user_id = %s;
