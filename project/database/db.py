@@ -1,5 +1,9 @@
-import os
-import psycopg
+from pathlib import Path
+from dotenv import load_dotenv
+import psycopg, os
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 conn = psycopg.connect(
     dbname=os.getenv("DB_NAME"),
