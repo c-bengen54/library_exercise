@@ -2,6 +2,25 @@ from database.db import _execute, _fetch_one, _fetch_all
 from psycopg import sql
 
 def db_add_book(title, author, publication, genre, isbn):
+    """
+    Adds a new book to the books table.
+
+    Parameters:
+        title (str):
+            Title of the book.
+        author (str):
+            Author of the book.
+        publication (int):
+            Year the book was published.
+        genre (str):
+            Genre or category of the book.
+        isbn (str):
+            ISBN-10 or ISBN-13 identifier for the book. Hyphens may be
+            accepted depending on the database validation function.
+
+    Returns:
+        None
+    """
     _execute(
         """
         INSERT INTO books (title, author, publication, genre, isbn_code)
@@ -12,10 +31,20 @@ def db_add_book(title, author, publication, genre, isbn):
 
 def db_get_book_by(query, param):
     """
-    Query must match column name, and the param type must match query
-    i.e. id query must have integer param and title query must have text based param
-    """
+    Finds the first book matching a specified column and value.
 
+    Parameters:
+        query (str):
+            Name of the books table column to search.
+            Examples include "id", "title", "author", or "isbn_code".
+        param:
+            Value to search for. Its type must match the selected column.
+
+    Returns:
+        tuple | None:
+            The first matching book record, or None if no matching book
+            is found.
+    """
     statement = sql.SQL(
         """
         SELECT *
@@ -28,6 +57,16 @@ def db_get_book_by(query, param):
     return _fetch_one(statement, (param,))
 
 def db_delete_book(book_id):
+    """
+    Deletes a book from the books table.
+
+    Parameters:
+        book_id (int):
+            Unique database ID of the book to delete.
+
+    Returns:
+        None
+    """
     _execute(
         """
         DELETE from books
@@ -37,6 +76,21 @@ def db_delete_book(book_id):
     )
 
 def db_check_out(member_id, book_id):
+    """
+    Checks a book out to a member.
+
+    This updates the book's checkout status and holder ID and creates a
+    corresponding record in the borrowed_books table.
+
+    Parameters:
+        member_id (int):
+            Unique ID of the member borrowing the book.
+        book_id (int):
+            Unique ID of the book being checked out.
+
+    Returns:
+        None
+    """
     _execute(
         """
         BEGIN TRANSACTION;
@@ -56,6 +110,16 @@ def db_check_out(member_id, book_id):
     )
 
 def db_return_book(book_id):
+    """
+    Marks a book as returned and removes its borrowed_books record.
+
+    Parameters:
+        book_id (int):
+            Unique ID of the book being returned.
+
+    Returns:
+        None
+    """
     _execute(
         """
         UPDATE books
@@ -70,6 +134,18 @@ def db_return_book(book_id):
     )
 
 def db_reserve_book(book_id, member_id):
+    """
+    Adds a member to the reservation queue for a book.
+
+    Parameters:
+        book_id (int):
+            Unique ID of the book being reserved.
+        member_id (int):
+            Unique ID of the member making the reservation.
+
+    Returns:
+        None
+    """
     _execute(
         """
         INSERT INTO reservations (book_id, member_id)
@@ -79,6 +155,19 @@ def db_reserve_book(book_id, member_id):
     )
 
 def db_get_reservation(book_id):
+    """
+    Retrieves all reservations for a specific book in the order they
+    were created.
+
+    Parameters:
+        book_id (int):
+            Unique ID of the book whose reservation queue is being
+            retrieved.
+
+    Returns:
+        list:
+            List of reservation records ordered by reservation time.
+    """
     return _fetch_all(
         """
         SELECT * 
@@ -90,6 +179,18 @@ def db_get_reservation(book_id):
     )
 
 def db_cancel_reservation(book_id, member_id):
+    """
+    Removes a member's reservation for a specific book.
+
+    Parameters:
+        book_id (int):
+            Unique ID of the reserved book.
+        member_id (int):
+            Unique ID of the member whose reservation should be removed.
+
+    Returns:
+        None
+    """
     _execute(
         """
         DELETE FROM reservations
@@ -102,6 +203,18 @@ def db_cancel_reservation(book_id, member_id):
     )
 
 def db_get_all_books():
+    """
+    Retrieves all books that are currently available for checkout.
+
+    Returns only books whose checked_out value is FALSE.
+
+    Parameters:
+        None
+
+    Returns:
+        list:
+            List of available book records.
+    """
     return _fetch_all(
         """
         SELECT *
@@ -111,6 +224,18 @@ def db_get_all_books():
         )
 
 def db_is_checked_out(book_id):
+    """
+    Determines whether a specific book is currently checked out.
+
+    Parameters:
+        book_id (int):
+            Unique ID of the book to check.
+
+    Returns:
+        tuple | None:
+            A tuple containing the book's checked_out value, or None if
+            the book does not exist.
+    """
     return _fetch_one(
         """
         SELECT checked_out
@@ -121,6 +246,18 @@ def db_is_checked_out(book_id):
     )
 
 def db_get_holder(book_id):
+    """
+    Retrieves the ID of the member currently holding a book.
+
+    Parameters:
+        book_id (int):
+            Unique ID of the book.
+
+    Returns:
+        tuple | None:
+            A tuple containing the holder's member ID, or None if the
+            book does not exist or currently has no holder.
+    """
     return _fetch_one(
         """
         SELECT holder_id
@@ -129,123 +266,3 @@ def db_get_holder(book_id):
         """,
         (book_id,)
     )
-
-book_titles = [
-    "1984",
-    "To Kill a Mockingbird",
-    "The Hobbit",
-    "Dune",
-    "The Great Gatsby",
-    "The Catcher in the Rye",
-    "The Lord of the Rings",
-    "The Martian",
-    "Jurassic Park",
-    "The Hunger Games",
-    "The Da Vinci Code",
-    "Pride and Prejudice",
-    "Dracula",
-    "Frankenstein",
-    "The Shining",
-    "Harry Potter and the Sorcerer's Stone",
-    "The Name of the Wind",
-    "Mistborn",
-    "The Road",
-    "Ready Player One"
-]
-
-authors = [
-    "George Orwell",
-    "Harper Lee",
-    "J.R.R. Tolkien",
-    "Frank Herbert",
-    "F. Scott Fitzgerald",
-    "J.D. Salinger",
-    "J.R.R. Tolkien",
-    "Andy Weir",
-    "Michael Crichton",
-    "Suzanne Collins",
-    "Dan Brown",
-    "Jane Austen",
-    "Bram Stoker",
-    "Mary Shelley",
-    "Stephen King",
-    "J.K. Rowling",
-    "Patrick Rothfuss",
-    "Brandon Sanderson",
-    "Cormac McCarthy",
-    "Ernest Cline"
-]
-
-genres = [
-    "Dystopian",
-    "Classic",
-    "Fantasy",
-    "Science Fiction",
-    "Classic",
-    "Classic",
-    "Fantasy",
-    "Science Fiction",
-    "Science Fiction",
-    "Young Adult",
-    "Mystery",
-    "Romance",
-    "Horror",
-    "Horror",
-    "Horror",
-    "Fantasy",
-    "Fantasy",
-    "Fantasy",
-    "Post-Apocalyptic",
-    "Science Fiction"
-]
-
-publication_years = [
-    1949,
-    1960,
-    1937,
-    1965,
-    1925,
-    1951,
-    1954,
-    2011,
-    1990,
-    2008,
-    2003,
-    1813,
-    1897,
-    1818,
-    1977,
-    1997,
-    2007,
-    2006,
-    2006,
-    2011
-]
-
-isbns = [
-    "978-0-45-152493-5",  
-    "978-0-06-093546-7",  
-    "978-0-54-792822-7", 
-    "978-0-44-117271-9", 
-    "978-0-74-327356-5",  
-    "978-0-31-676948-8",  
-    "978-0-61-864015-7",  
-    "978-0-55-341802-6",  
-    "978-0-34-553898-7",  
-    "978-0-43-902348-1",  
-    "978-0-30-747427-8",  
-    "978-0-14-143951-8",  
-    "978-0-14-143984-6",  
-    "978-0-14-143947-1",  
-    "978-0-30-774365-7",  
-    "978-0-59-035342-7",  
-    "978-0-75-640474-1",  
-    "978-0-76-535038-1",  
-    "978-0-30-738789-9",  
-    "978-0-30-788744-3",  
-]
-
-"""
-for title, author, pub, genre, isbn in zip(book_titles, authors, publication_years, genres, isbns):
-    db_add_book(title, author, pub, genre, isbn)
-"""
