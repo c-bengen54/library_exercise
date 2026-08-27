@@ -1,0 +1,19 @@
+# Python cache
+__pycache__/
+*.pyc
+
+#Other version files
+database_setup/
+models/
+main.py
+system.py
+
+# Virtual environment
+venv/
+.venv/
+
+# macOS
+.DS_Store
+
+#Environment
+.env
