@@ -1,7 +1,7 @@
 from database.db import _execute, _fetch_one, _fetch_all
 from psycopg import sql
 
-def db_add_book(title, author, publication, genre, isbn):
+def db_add_book(title:str, author:str, publication:int, genre:str, isbn:str):
     """
     Adds a new book to the books table.
 
@@ -29,7 +29,7 @@ def db_add_book(title, author, publication, genre, isbn):
         (title, author, publication, genre, isbn,)
     )
 
-def db_get_book_by(query, param):
+def db_get_book_by(query:str, param):
     """
     Finds the first book matching a specified column and value.
 
@@ -56,7 +56,7 @@ def db_get_book_by(query, param):
     )
     return _fetch_one(statement, (param,))
 
-def db_delete_book(book_id):
+def db_delete_book(book_id:int):
     """
     Deletes a book from the books table.
 
@@ -75,7 +75,7 @@ def db_delete_book(book_id):
         (book_id,)
     )
 
-def db_check_out(member_id, book_id):
+def db_check_out(member_id:int, book_id:int):
     """
     Checks a book out to a member.
 
@@ -109,7 +109,7 @@ def db_check_out(member_id, book_id):
         (member_id, book_id)
     )
 
-def db_return_book(book_id):
+def db_return_book(book_id:int):
     """
     Marks a book as returned and removes its borrowed_books record.
 
@@ -139,7 +139,7 @@ def db_return_book(book_id):
         (book_id,)
     )
 
-def db_reserve_book(book_id, member_id):
+def db_reserve_book(book_id:int, member_id:int):
     """
     Adds a member to the reservation queue for a book.
 
@@ -160,7 +160,7 @@ def db_reserve_book(book_id, member_id):
         (book_id, member_id,)
     )
 
-def db_get_reservation(book_id):
+def db_get_reservation(book_id:int):
     """
     Retrieves all reservations for a specific book in the order they
     were created.
@@ -184,7 +184,7 @@ def db_get_reservation(book_id):
         (book_id,)
     )
 
-def db_cancel_reservation(book_id, member_id):
+def db_cancel_reservation(book_id:int, member_id:int):
     """
     Removes a member's reservation for a specific book.
 
@@ -224,12 +224,11 @@ def db_get_all_books():
     return _fetch_all(
         """
         SELECT *
-        from books
-        WHERE checked_out = FALSE;
+        from books;
         """
         )
 
-def db_is_checked_out(book_id):
+def db_is_checked_out(book_id:int):
     """
     Determines whether a specific book is currently checked out.
 
@@ -251,7 +250,7 @@ def db_is_checked_out(book_id):
         (book_id,)
     )
 
-def db_get_holder(book_id):
+def db_get_holder(book_id:int):
     """
     Retrieves the ID of the member currently holding a book.
 
