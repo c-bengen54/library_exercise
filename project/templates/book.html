@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ book[1] }}
+{% endblock %}
+
+{% block content %}
+
+<div class="card card-small">
+
+    <h1 class="dash-header">
+        {{ book[1] }}
+    </h1>
+
+    <p class="subtitle">
+        {{ book[2] }}
+    </p>
+
+
+    <div class="profile-row">
+        <span class="key">Author</span>
+        <span class="val">{{ book[2] }}</span>
+    </div>
+
+    <div class="profile-row">
+        <span class="key">Publication</span>
+        <span class="val">{{ book[3] }}</span>
+    </div>
+
+    <div class="profile-row">
+        <span class="key">Genre</span>
+        <span class="val">{{ book[4] }}</span>
+    </div>
+
+    <div class="profile-row">
+        <span class="key">ISBN</span>
+        <span class="val">{{ book[5] }}</span>
+    </div>
+
+
+    {% if book[6] %}
+
+        <span class="tag">
+            Checked Out
+        </span>
+
+    {% else %}
+
+        <span class="tag">
+            Available
+        </span>
+
+    {% endif %}
+
+    {% if book[6] and session["user_id"] != book[7] %}
+
+        <form method="POST" action="{{ url_for('books.reserve', book_id=book[0]) }}">
+
+            <button class="btn" type="submit">
+                Reserve title
+            </button>
+
+        </form>
+    
+    {% elif book[6] and session["user_id"] == book[7] %}
+
+        <form method="POST" action="{{ url_for('books.return_book', book_id=book[0]) }}">
+
+            <button class="btn" type="submit">
+                Return title
+            </button>
+
+        </form>
+    
+    {% else %}
+
+        <form method="POST" action="{{ url_for('books.checkout', book_id=book[0]) }}">
+
+            <button class="btn" type="submit">
+                Check Out
+            </button>
+
+        </form>
+
+    {% endif %}
+
+<span class="footer-link"><a href="{{ url_for('account.account') }}">← Back to Dashboard</a></span>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}
+Book List
+{% endblock %}
+
+{% block content %}
+
+<div class="library-page">
+
+    <div class="logo">
+        LibraSystem®
+        <span class="logo-dot"></span>
+    </div>
+
+    <p class="subtitle">
+        Browse the collection
+    </p>
+    
+
+    <div class="book-grid">
+        <span class="footer-link"><a href="{{ url_for('account.account') }}">← Back to Dashboard</a></span>
+
+        {% for book in books %}
+
+        <div class="book-card">
+
+            <h2 class="book-title">
+                {{ book[1] }}
+            </h2>
+
+            <p class="book-author">
+                {{ book[2] }}
+            </p>
+
+            <p>
+                {{ book[4] }}
+            </p>
+
+            <div class="book-status">
+
+                {% if book[6] %}
+                    <span class="tag">Checked Out</span>
+                {% else %}
+                    <span class="tag">Available</span>
+                {% endif %}
+
+            </div>
+
+            <a
+                class="btn"
+                href="{{ url_for('books.book', book_id=book[0]) }}"
+            >
+                View Book
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

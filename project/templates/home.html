@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div class="logo">
+        LibraSystem®
+        <span class="logo-dot"></span>
+    </div>
+
+    <p class="subtitle">
+        Library Management System
+    </p>
+
+    <p>
+        Browse the library, manage your books,
+        and keep track of your borrowing activity.
+    </p>
+
+    <a class="btn" href="{{ url_for('auth.login') }}">
+        Login
+    </a>
+
+</div>
+
+{% endblock %}
