@@ -11,6 +11,7 @@ system.py
 # Virtual environment
 venv/
 .venv/
+.vscode/
 
 # macOS
 .DS_Store
