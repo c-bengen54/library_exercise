@@ -6,7 +6,6 @@ import bcrypt, random
 auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.route("/login", methods=["GET", "POST"])
-@auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
@@ -46,28 +45,28 @@ def login():
         if user[7] == "admin":
             return redirect(url_for("admin.dashboard", user=session))
         
-        return redirect(url_for("account.account"))
+        return redirect(url_for("account.dashboard"))
 
     return render_template("login.html")
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"]
-        password = bcrypt.hashpw(request.form["password"].encode("utf-8"), bcrypt.gensalt())
-        email = request.form["email"]
-        first_name = request.form["first_name"]
-        last_name = request.form["last_name"]
-        access_code = request.form["access_code"]
+        username = request.form["username"].strip()
+        password = bcrypt.hashpw(request.form["password"].encode("utf-8"), bcrypt.gensalt()).strip()
+        email = request.form["email"].strip()
+        first_name = request.form["first_name"].strip()
+        last_name = request.form["last_name"].strip()
+        access_code = request.form["access_code"].strip()
+
         while True:
                     identity = random.randint(100000, 999999)
                     if db_find("users", "user_id", identity) is None:
                         break
         
+        db_code = db_get_admin_code()[0]
 
-        db_code = db_get_admin_code()[1]
-
-        if access_code != db_code:
+        if access_code != str(db_code):
             user_type = "member"
         else:
             user_type = "admin"
@@ -81,7 +80,10 @@ def register():
 
         db_register_user(identity, username, first_name, last_name, email, password, user_type)
 
-        return redirect(url_for("account.dashboard"))
+        if user_type == "admin":
+             return redirect(url_for("admin.dashboard"))
+        else:
+            return redirect(url_for("account.dashboard"))
 
     return render_template("register.html")
 

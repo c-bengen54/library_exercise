@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+{% block content %}
+<div class="library-page">
+    <div class="logo">
+        LibraSystem®
+        <span class="logo-dot"></span>
+    </div>
+
+    <p class="subtitle">
+        Admin Dashboard
+    </p>
+
+    <div class="card card-small">
+        <div class="profile-row">Username: {{ session["username"] }}</div>
+        <div class="profile-row">Admin ID: {{ session["user_id"] }}</div>
+    </div>
+
+    <div class="book-grid">
+        <a class="btn" href="{{ url_for('admin.add_book') }}">
+            Add Book
+        </a>
+
+        <a class="btn" href="{{ url_for('account.settings') }}">
+            Remove Books
+        </a>
+
+        <a class="btn" href="{{ url_for('account.dashboard') }}">
+            Update user
+        </a>
+
+        <a class="btn" href="{{ url_for('admin.view_logs') }}">
+            View Logs
+        </a>
+        
+        <a class="btn" href="{{ url_for('books.books') }}">
+            View Books
+        </a>
+
+        <a class="btn" href="{{ url_for('main.home') }}">
+            Log out
+        </a>
+    </div>
+
+</div>
+{% endblock %}

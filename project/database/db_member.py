@@ -1,4 +1,4 @@
-from database.db import _execute, _fetch_one, _fetch_all
+from project.database.db import _execute, _fetch_one, _fetch_all
 from psycopg import sql
 import secrets
 from datetime import datetime, timedelta, timezone

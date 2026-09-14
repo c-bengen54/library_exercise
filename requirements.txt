@@ -1,3 +1,5 @@
 bcrypt
-psychopg
+psycopg_pool
+psycopg[binary]
 flask
+gunicorn
