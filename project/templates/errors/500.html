@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+Something Went Wrong
+{% endblock %}
+
+{% block content %}
+<div class="card card-small">
+    <div class="logo">
+        LibraSystem®
+        <span class="logo-dot"></span>
+    </div>
+
+    <h1 class="dash-header">500</h1>
+
+    <p class="subtitle">Something went wrong on our end. It's been logged and we'll look into it.</p>
+
+    <span class="footer-link"><a href="{{ url_for('main.home') }}">← Back to Home</a></span>
+</div>
+{% endblock %}

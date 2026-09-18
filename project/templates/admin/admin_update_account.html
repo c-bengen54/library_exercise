@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+Update Account
+{% endblock %}
+
+{% block content %}
+<div class="card card-small">
+    <div class="logo">
+        LibraSystem®
+        <span class="logo-dot"></span>
+    </div>
+
+    <p class="subtitle">Update account</p>
+
+    <div class="profile-row">
+        <span class="key">Username</span>
+        <span class="val">{{ member[2] }}</span>
+    </div>
+
+    <div class="profile-row">
+        <span class="key">User ID</span>
+        <span class="val">{{ member[1] }}</span>
+    </div>
+
+    <form method="POST">
+
+        <div class="field">
+            <label for="query">Field to update</label>
+            <select id="query" name="query" required>
+                <option value="username">Username</option>
+                <option value="user_id">User ID</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="value">New value</label>
+            <input type="text" id="value" name="value" placeholder="Enter new value" required>
+        </div>
+
+        <button class="btn" type="submit">Update</button>
+
+    </form>
+
+    <span class="footer-link"><a href="{{ url_for('admin.dashboard') }}">← Back to Dashboard</a></span>
+</div>
+{% endblock %}

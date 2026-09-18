@@ -1,7 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
-from database.db_member import db_find, db_register_user, db_get_admin_code
-import bcrypt, random
+from project.database.db_member import * 
+import bcrypt, random, pyotp, os
+from datetime import datetime, timezone
+from pathlib import Path
+from dotenv import load_dotenv
 
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+load_dotenv(BASE_DIR / ".env")
+
+ADMIN_TOTP = pyotp.TOTP(os.getenv("ADMIN_TOTP_SECRET"))
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -16,13 +23,13 @@ def login():
 
         if user is None:
             return render_template(
-                "login.html",
+                "system/login.html",
                 error="Invalid login information."
             )
 
         if user[2] != username:
             return render_template(
-                "login.html",
+                "system/login.html",
                 error="Invalid login information."
             )
 
@@ -31,7 +38,7 @@ def login():
 
         if not bcrypt.checkpw(password, stored_hash):
             return render_template(
-                "login.html",
+                "system/login.html",
                 error="Invalid login information."
             )
 
@@ -42,12 +49,14 @@ def login():
         session["email"] = user[5]
         session["user_type"] = user[7]
 
+        db_log_event(user[1], f"User with id: {user[1]} logged in", datetime.now(timezone.utc))
+
         if user[7] == "admin":
-            return redirect(url_for("admin.dashboard", user=session))
+            return redirect(url_for("admin.dashboard"))
         
         return redirect(url_for("account.dashboard"))
 
-    return render_template("login.html")
+    return render_template("system/login.html")
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -64,9 +73,7 @@ def register():
                     if db_find("users", "user_id", identity) is None:
                         break
         
-        db_code = db_get_admin_code()[0]
-
-        if access_code != str(db_code):
+        if not ADMIN_TOTP.verify(access_code, valid_window=1):
             user_type = "member"
         else:
             user_type = "admin"
@@ -80,15 +87,18 @@ def register():
 
         db_register_user(identity, username, first_name, last_name, email, password, user_type)
 
+        db_log_event(identity, f"User registered with type: {user_type}", datetime.now(timezone.utc))
+
         if user_type == "admin":
              return redirect(url_for("admin.dashboard"))
         else:
             return redirect(url_for("account.dashboard"))
 
-    return render_template("register.html")
+    return render_template("system/register.html")
 
 @auth_bp.route("/logout")
 def logout():
+    db_log_event(session.get("user_id"), f"User with id {session.get("user_id")} has logged out", datetime.now(timezone.utc))
     session.clear()
 
     return redirect(url_for("auth.login"))

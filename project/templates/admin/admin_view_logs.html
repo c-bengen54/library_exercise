@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+System Logs
+{% endblock %}
+
+{% block content %}
+<div class="library-page">
+    <div class="logo">
+        LibraSystem®
+        <span class="logo-dot"></span>
+    </div>
+
+    <p class="subtitle">System Logs</p>
+
+    <div class="card">
+
+        {% for log in logs %}
+            <div class="profile-row">
+                <span class="key">{{ log[3] }} — user {{ log[1] }}</span>
+                <span class="val">{{ log[2] }}</span>
+            </div>
+        {% else %}
+            <div class="profile-row">
+                <span class="val">No log entries yet.</span>
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <span class="footer-link"><a href="{{ url_for('admin.dashboard') }}">← Back to Dashboard</a></span>
+</div>
+{% endblock %}

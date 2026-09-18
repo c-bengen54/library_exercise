@@ -19,7 +19,12 @@ Book List
     
 
     <div class="book-grid">
-        <span class="footer-link"><a href="{{ url_for('account.account') }}">← Back to Dashboard</a></span>
+        {% if session["user_type"] == "admin" %}
+            <span class="footer-link"><a href="{{ url_for('admin.dashboard') }}">← Back to Dashboard</a></span>
+        {% else %}
+            <span class="footer-link"><a href="{{ url_for('account.dashboard') }}">← Back to Dashboard</a></span>
+        {% endif %}
+
 
         {% for book in books %}
 
@@ -53,6 +58,12 @@ Book List
             >
                 View Book
             </a>
+            
+            {% if session["user_type"] == "admin" %}
+                <a class="btn btn-outline" href="{{ url_for('admin.remove_book', book_id=book[0]) }}">
+                    Remove
+                </a>
+            {% endif %}
 
         </div>
 

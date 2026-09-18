@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+Find User
+{% endblock %}
+
+{% block content %}
+<div class="card card-small">
+    <div class="logo">
+        LibraSystem®
+        <span class="logo-dot"></span>
+    </div>
+
+    <p class="subtitle">Find a user to update</p>
+
+    <form method="POST">
+
+        <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter username" required>
+        </div>
+
+        <button class="btn" type="submit">Find User</button>
+
+    </form>
+
+    <span class="footer-link"><a href="{{ url_for('admin.dashboard') }}">← Back to Dashboard</a></span>
+</div>
+{% endblock %}

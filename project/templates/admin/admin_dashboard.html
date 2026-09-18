@@ -25,11 +25,11 @@ Admin Dashboard
             Add Book
         </a>
 
-        <a class="btn" href="{{ url_for('account.settings') }}">
+        <a class="btn" href="{{ url_for('books.books') }}">
             Remove Books
         </a>
 
-        <a class="btn" href="{{ url_for('account.dashboard') }}">
+        <a class="btn" href="{{ url_for('admin.lookup_account') }}">
             Update user
         </a>
 
@@ -41,7 +41,7 @@ Admin Dashboard
             View Books
         </a>
 
-        <a class="btn" href="{{ url_for('main.home') }}">
+        <a class="btn" href="{{ url_for('auth.logout') }}">
             Log out
         </a>
     </div>

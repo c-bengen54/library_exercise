@@ -21,9 +21,9 @@ def login_required(view):
 @account_bp.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template("user/dashboard.html")
 
 @account_bp.route("/settings")
 @login_required
 def settings():
-    return render_template("settings.html")
+    return render_template("user/settings.html")

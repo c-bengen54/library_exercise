@@ -3,3 +3,5 @@ psycopg_pool
 psycopg[binary]
 flask
 gunicorn
+pyotp
+qrcode[pil]
